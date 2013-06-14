@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.vaadin.johannesd.vquery.Filter.ByPredicate;
 
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
@@ -343,6 +344,78 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     public This setReadOnly(boolean readOnly) {
         for (C c : cs) {
             c.setReadOnly(readOnly);
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the size of all the components in this set to 100% x 100%.
+     * 
+     * @see Component#setSizeFull()
+     */
+    public This setSizeFull() {
+        for (C c : cs) {
+            c.setSizeFull();
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the size of all the components in this set to undefined.
+     * 
+     * @see Component#setSizeUndefined()
+     */
+    public This setSizeUndefined() {
+        for (C c : cs) {
+            c.setSizeUndefined();
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the width of all the components in this set.
+     * 
+     * @see Component#setWidth(String).
+     */
+    public This setWidth(String width) {
+        for (C c : cs) {
+            c.setWidth(width);
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the width of all the components in this set.
+     * 
+     * @see Component#setWidth(float, Unit).
+     */
+    public This setWidth(float width, Unit unit) {
+        for (C c : cs) {
+            c.setWidth(width, unit);
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the height of all the components in this set.
+     * 
+     * @see Component#setHeight(String)
+     */
+    public This setHeight(String height) {
+        for (C c : cs) {
+            c.setHeight(height);
+        }
+        return createQuery();
+    }
+
+    /**
+     * Sets the height of all the components in this set.
+     * 
+     * @see Component#setHeight(float, Unit)
+     */
+    public This setHeight(float height, Unit unit) {
+        for (C c : cs) {
+            c.setHeight(height, unit);
         }
         return createQuery();
     }
