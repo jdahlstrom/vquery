@@ -85,10 +85,13 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      *************/
 
     /**
-     * Returns a query with those components for which
+     * Returns the subset of components in this set for which
      * {@link Predicate#apply(Component) p.apply()} returns true.
+     * 
+     * @param p
+     *            The predicate used for filtering.
      */
-    public This filter(Predicate<C> p) {
+    public This filter(Predicate<? super C> p) {
         return filter(new ByPredicate<C>(p));
     }
 

@@ -24,9 +24,9 @@ public interface Filter<T extends Component> {
     Set<T> apply(Set<T> cs);
 
     class ByPredicate<T extends Component> implements Filter<T> {
-        private Predicate<T> predicate;
+        private Predicate<? super T> predicate;
 
-        public ByPredicate(Predicate<T> p) {
+        public ByPredicate(Predicate<? super T> p) {
             predicate = p;
         }
 
