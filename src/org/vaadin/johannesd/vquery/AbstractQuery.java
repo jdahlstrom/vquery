@@ -233,7 +233,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
         return new Query<D>(result);
     }
 
-    public This isAlso(Class<?> klass) {
+    public This is(Class<?> klass) {
         Set<C> result = set();
         for (C c : cs) {
             if (klass.isAssignableFrom(c.getClass())) {
