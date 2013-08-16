@@ -22,11 +22,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.vaadin.johannesd.vquery.VQuery.$;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -40,38 +44,90 @@ import com.vaadin.ui.VerticalLayout;
 public class FilteringTest {
 
     Component[] cs;
-    Query<Component> $;
+    Query<Component> query;
 
     @Before
     public void setUp() {
         cs = new Component[] { new Button(), new TextField(), new Panel(),
                 new VerticalLayout(new Button()), new TextArea(),
                 new CheckBox() };
-        $ = $(cs);
+        query = VQuery.select(cs);
+    }
+
+    @Test
+    public void testFilter() {
+        Query<?> none = query.filter(new Filter<Component>() {
+            @Override
+            public Set<Component> apply(Set<Component> cs) {
+                return Collections.emptySet();
+            }
+        });
+        assertFalse(none.exists());
+
+        none = query.filter(new Predicate<Component>() {
+            @Override
+            public boolean apply(Component c) {
+                return false;
+            }
+        });
+        assertFalse(none.exists());
+
+        cs[0].setCaption("");
+        cs[3].setCaption("Caption");
+        Query<?> expected = VQuery.select(cs[0], cs[3]);
+
+        Query<?> hasCaption = query.filter(new Filter<Component>() {
+            @Override
+            public Set<Component> apply(Set<Component> cs) {
+                Set<Component> result = new LinkedHashSet<Component>();
+                for (Component c : cs) {
+                    if (c.getCaption() != null) {
+                        result.add(c);
+                    }
+                }
+                return result;
+            }
+        });
+        assertEquals(expected, hasCaption);
+
+        hasCaption = query.filter(new Predicate<Component>() {
+            @Override
+            public boolean apply(Component c) {
+                return c.getCaption() != null;
+            }
+        });
+        assertEquals(expected, hasCaption);
+
     }
 
     @Test
     public void testIs() {
-        assertArrayEquals(cs, $.is(Component.class).get().toArray());
+        assertArrayEquals(cs, query.is(Component.class).get().toArray());
 
-        assertSame(cs[0], $.is(Button.class).one());
+        assertSame(cs[0], query.is(Button.class).one());
+        assertSame(cs[2], query.is(cs[2]).one());
 
-        assertSame(cs[2], $.is(cs[2]).one());
-
-        Query<AbstractTextField> atf = $.is(AbstractTextField.class);
+        Query<AbstractTextField> atf = query.is(AbstractTextField.class);
 
         assertEquals(2, atf.size());
         assertSame(cs[1], atf.index(0));
         assertSame(cs[4], atf.index(1));
 
-        assertFalse($.is(Label.class).exists());
+        assertFalse(query.is(Label.class).exists());
+
+        Query<Component> props = query.is(Property.class);
+
+        assertEquals(3, props.size());
+        assertSame(cs[1], props.index(0));
+        assertSame(cs[4], props.index(1));
+        assertSame(cs[5], props.index(2));
     }
 
     @Test
     public void testId() {
         cs[2].setId("my-id");
         try {
-            assertSame(cs[2], $.id("my-id").one());
+            assertSame(cs[2], query.id("my-id").one());
         } catch (Exception e) {
             fail("Should have exactly one component with my-id");
         }
@@ -79,11 +135,11 @@ public class FilteringTest {
 
     @Test
     public void testHasStyleName() {
-        assertFalse($.hasStyleName("my-style").exists());
+        assertFalse(query.hasStyleName("my-style").exists());
         cs[3].addStyleName("my-style my-other-style");
         try {
-            assertSame(cs[3], $.hasStyleName("my-style").one());
-            assertSame(cs[3], $.hasStyleName("my-other-style").one());
+            assertSame(cs[3], query.hasStyleName("my-style").one());
+            assertSame(cs[3], query.hasStyleName("my-other-style").one());
         } catch (Exception e) {
             fail("Should have exactly one component with my-style");
         }
@@ -91,7 +147,7 @@ public class FilteringTest {
 
     @Test
     public void testIsField() {
-        FieldQuery<?> fields = $.isField();
+        FieldQuery<?> fields = query.isField();
         assertEquals(3, fields.size());
         assertSame(cs[1], fields.index(0));
         assertSame(cs[4], fields.index(1));
@@ -103,7 +159,7 @@ public class FilteringTest {
 
     @Test
     public void testIsLeaf() {
-        Query<Component> leaves = $.isLeaf(true);
+        Query<Component> leaves = query.isLeaf(true);
         assertEquals(5, leaves.size());
         assertTrue(leaves.is(cs[0]).exists());
         assertTrue(leaves.is(cs[1]).exists());
