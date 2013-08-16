@@ -26,26 +26,47 @@ import com.vaadin.ui.UI;
 
 public class VQuery {
 
-    public static final Query<Component> $ = $();
-
     public static Query<Component> $() {
+        return all();
+    }
+
+    public static <C extends Component> Query<C> $(C... cs) {
+        return VQuery.select(Arrays.asList(cs));
+    }
+
+    public static <C extends Component> Query<C> $(Collection<C> cs) {
+        return VQuery.select(cs);
+    }
+
+    public static FieldQuery<Field<?>> $(Field<?>... fields) {
+        return VQuery.select(Arrays.asList(fields));
+    }
+
+    public static FieldQuery<Field<?>> $(Collection<Field<?>> fields) {
+        return VQuery.select(fields);
+    }
+
+    public static Query<Component> all() {
+        if (UI.getCurrent() == null) {
+            throw new IllegalStateException("UI.getCurrent() is null");
+        }
         Query<Component> ui = $((Component) UI.getCurrent());
         return ui.descendants().with(ui);
     }
 
-    public static <C extends Component> Query<C> $(C... cs) {
-        return $(Arrays.asList(cs));
+    public static <C extends Component> Query<C> select(C... cs) {
+        return VQuery.select(Arrays.asList(cs));
     }
 
-    public static <C extends Component> Query<C> $(Collection<C> cs) {
+    public static <C extends Component> Query<C> select(Collection<C> cs) {
         return new Query<C>(new LinkedHashSet<C>(cs));
     }
 
-    public static FieldQuery<Field<?>> $(Field<?>... fields) {
-        return new FieldQuery<Field<?>>(Arrays.asList(fields));
+    public static FieldQuery<Field<?>> select(Field<?>... fields) {
+        return select(Arrays.asList(fields));
     }
 
-    public static FieldQuery<Field<?>> $(Collection<Field<?>> fields) {
+    public static FieldQuery<Field<?>> select(Collection<Field<?>> fields) {
         return new FieldQuery<Field<?>>(fields);
     }
 
