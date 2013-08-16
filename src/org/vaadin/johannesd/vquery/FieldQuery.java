@@ -20,13 +20,14 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator;
 import com.vaadin.ui.Field;
 
 public class FieldQuery<F extends Field<?>> extends
         AbstractQuery<F, FieldQuery<F>> {
 
-    public <G extends F> FieldQuery(G field) {
-        super(field);
+    public <G extends F> FieldQuery(G... fs) {
+        super(fs);
     }
 
     public FieldQuery(AbstractQuery<? extends F, ?> query) {
@@ -87,27 +88,35 @@ public class FieldQuery<F extends Field<?>> extends
         for (Field<?> f : get()) {
             f.addValueChangeListener(listener);
         }
-        return this;
-    }
-
-    public FieldQuery<F> setValue(Object value) {
-        for (Field<?> f : get()) {
-            f.setValue(value);
-        }
+        return createQuery();
     }
 
     public FieldQuery<F> setRequired(boolean required) {
         for (Field<?> f : get()) {
             f.setRequired(required);
         }
-        return this;
+        return createQuery();
     }
 
     public FieldQuery<F> setRequiredError(String error) {
         for (Field<?> f : get()) {
             f.setRequiredError(error);
         }
-        return this;
+        return createQuery();
+    }
+
+    public FieldQuery<F> addValidator(Validator v) {
+        for (Field<?> f : get()) {
+            f.addValidator(v);
+        }
+        return createQuery();
+    }
+
+    public FieldQuery<F> removeValidator(Validator v) {
+        for (Field<?> f : get()) {
+            f.removeValidator(v);
+        }
+        return createQuery();
     }
 
     @Override
