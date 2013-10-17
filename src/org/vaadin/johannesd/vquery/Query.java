@@ -31,6 +31,8 @@ public class Query<C extends Component> extends AbstractQuery<C, Query<C>> {
         super(cs);
     }
 
+    public Query(AbstractQuery<? extends C, ?> q) {
+        super(q);
     }
 
     @Override
