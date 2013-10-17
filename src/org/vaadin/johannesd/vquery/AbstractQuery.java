@@ -423,6 +423,58 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
         return createQuery();
     }
 
+    /***********************
+     * Hierarchy traversal *
+     ***********************/
+
+    /**
+     * Returns the set of all the descendants of all the components in this set.
+     * <p>
+     * Component c is a descendant of component d if and only if the parent of c
+     * is d or a descendant of d.
+     */
+    public Query<Component> descendants() {
+        return new Query<Component>(Map.descendants.apply(get()));
+    }
+
+    public Query<Component> descendants(int depth) {
+        return null; // TODO stub
+    }
+
+    /**
+     * Returns the set of all the children of all the components in this set.
+     */
+    public Query<Component> children() {
+        return new Query<Component>(Map.children.apply(get()));
+    }
+
+    /**
+     * Returns the set of the parents of the components in this set.
+     */
+    public Query<HasComponents> parent() {
+        return new Query<HasComponents>(Map.parent.apply(get()));
+    }
+
+    /**
+     * Returns the set of all the ancestors of all the components in this set.
+     * <p>
+     * Component c is an ancestor of component d if c is the parent of d or an
+     * ancestor of the parent.
+     */
+    public Query<HasComponents> ancestors() {
+        return new Query<HasComponents>(Map.ancestors.apply(get()));
+    }
+
+    public Query<HasComponents> ancestor(int depth) {
+        if (depth < 0) {
+            throw new IllegalArgumentException("Depth cannot be negative");
+        } else if (depth == 0) {
+            return parent();
+        } else {
+            return parent().ancestor(depth - 1);
+        }
+    }
+
     /**************************
      * Hierarchy manipulation *
      **************************/

@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HasComponents;
 
 public class Query<C extends Component> extends AbstractQuery<C, Query<C>> {
 
@@ -32,24 +31,6 @@ public class Query<C extends Component> extends AbstractQuery<C, Query<C>> {
         super(cs);
     }
 
-    /*
-     * Hierarchy traversal
-     */
-
-    public Query<Component> descendants() {
-        return new Query<Component>(Map.descendants.apply(get()));
-    }
-
-    public Query<Component> children() {
-        return new Query<Component>(Map.children.apply(get()));
-    }
-
-    public Query<HasComponents> parent() {
-        return new Query<HasComponents>(Map.parent.apply(get()));
-    }
-
-    public Query<HasComponents> ancestors() {
-        return new Query<HasComponents>(Map.ancestors.apply(get()));
     }
 
     @Override
