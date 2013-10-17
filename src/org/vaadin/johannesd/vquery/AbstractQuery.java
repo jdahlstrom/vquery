@@ -225,7 +225,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      */
     public <D extends C> Query<D> is(Class<D> klass) {
         Set<D> result = set();
-        for (C c : cs) {
+        for (C c : this) {
             if (klass.isAssignableFrom(c.getClass())) {
                 result.add(klass.cast((c)));
             }
@@ -235,7 +235,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
 
     public This is(Class<?> klass) {
         Set<C> result = set();
-        for (C c : cs) {
+        for (C c : this) {
             if (klass.isAssignableFrom(c.getClass())) {
                 result.add(c);
             }
@@ -249,7 +249,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      */
     public FieldQuery<Field<?>> isField() {
         Set<Field<?>> result = set();
-        for (C c : cs) {
+        for (C c : this) {
             if (c instanceof Field<?>) {
                 result.add((Field<?>) c);
             }
@@ -263,7 +263,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      */
     public <F extends Field<?>> FieldQuery<F> isField(Class<F> fieldType) {
         Set<F> result = set();
-        for (C c : cs) {
+        for (C c : this) {
             if (c instanceof Field<?>
                     && fieldType.isAssignableFrom(c.getClass())) {
                 @SuppressWarnings("unchecked")
@@ -282,7 +282,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Adds the given stylename to all the components in this query.
      */
     public This addStyleName(String sn) {
-        for (Component c : cs) {
+        for (C c : this) {
             c.addStyleName(sn);
         }
         return createQuery();
@@ -292,7 +292,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Removes the given stylename from all the components in this query.
      */
     public This removeStyleName(String sn) {
-        for (Component c : cs) {
+        for (C c : this) {
             c.removeStyleName(sn);
         }
         return createQuery();
@@ -302,7 +302,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Sets the stylename of all the components in this query.
      */
     public This setStyleName(String sn) {
-        for (Component c : cs) {
+        for (C c : this) {
             c.setStyleName(sn);
         }
         return createQuery();
@@ -312,7 +312,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Sets the primary stylename of all the components in this query.
      */
     public This setPrimaryStyleName(String sn) {
-        for (Component c : cs) {
+        for (C c : this) {
             c.setPrimaryStyleName(sn);
         }
         return createQuery();
@@ -323,7 +323,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * {@code visible.}
      */
     public This setVisible(boolean visible) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setVisible(visible);
         }
         return createQuery();
@@ -334,7 +334,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * {@code enabled.}
      */
     public This setEnabled(boolean enabled) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setEnabled(enabled);
         }
         return createQuery();
@@ -345,7 +345,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * {@code readOnly.}
      */
     public This setReadOnly(boolean readOnly) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setReadOnly(readOnly);
         }
         return createQuery();
@@ -357,7 +357,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * @see Component#setSizeFull()
      */
     public This setSizeFull() {
-        for (C c : cs) {
+        for (C c : this) {
             c.setSizeFull();
         }
         return createQuery();
@@ -369,7 +369,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * @see Component#setSizeUndefined()
      */
     public This setSizeUndefined() {
-        for (C c : cs) {
+        for (C c : this) {
             c.setSizeUndefined();
         }
         return createQuery();
@@ -381,7 +381,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * @see Component#setWidth(String).
      */
     public This setWidth(String width) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setWidth(width);
         }
         return createQuery();
@@ -393,7 +393,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * @see Component#setWidth(float, Unit).
      */
     public This setWidth(float width, Unit unit) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setWidth(width, unit);
         }
         return createQuery();
@@ -405,7 +405,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * @see Component#setHeight(String)
      */
     public This setHeight(String height) {
-        for (C c : cs) {
+        for (C c : this) {
             c.setHeight(height);
         }
         return createQuery();

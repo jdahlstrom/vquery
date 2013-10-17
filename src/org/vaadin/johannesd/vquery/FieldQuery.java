@@ -85,42 +85,42 @@ public class FieldQuery<F extends Field<?>> extends
      */
 
     public FieldQuery<F> addValueChangeListener(ValueChangeListener listener) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.addValueChangeListener(listener);
         }
         return createQuery();
     }
 
     public FieldQuery<F> removeValueChangeListener(ValueChangeListener listener) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.removeValueChangeListener(listener);
         }
         return createQuery();
     }
 
     public FieldQuery<F> setRequired(boolean required) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.setRequired(required);
         }
         return createQuery();
     }
 
     public FieldQuery<F> setRequiredError(String error) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.setRequiredError(error);
         }
         return createQuery();
     }
 
     public FieldQuery<F> addValidator(Validator v) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.addValidator(v);
         }
         return createQuery();
     }
 
     public FieldQuery<F> removeValidator(Validator v) {
-        for (Field<?> f : get()) {
+        for (Field<?> f : this) {
             f.removeValidator(v);
         }
         return createQuery();
