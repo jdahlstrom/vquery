@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Johannes Dahlström.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -36,14 +36,37 @@ import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.SingleComponentContainer;
 
 /**
- * Represents a set of Vaadin {@link Component components}
+ * Represents a set of Vaadin {@link Component components}.
+ * <p>
+ * When extending this class, the type of the extending class itself should be
+ * given as the {@code This} type parameter. The parameter is used as the return
+ * type of all the methods returning a set with the component type equal to
+ * {@code C}, enabling proper method chaining. The abstract factory method
+ * {@code createQuery} should be overridden like in the following example:
+ * <p>
+ * 
+ * <pre>
+ * // A specialized query for Fields
+ * public class FieldQuery{@code <F extends Field>}
+ *         extends AbstractQuery{@code <F, MyQuery<F extends Field>>} {
+ * 
+ *     {@code @}Override
+ *     protected {@code <G extends F> FieldQuery<F> createQuery(Set<G> gs)} {
+ *         return new FieldQuery<F>(gs);
+ *     }
+ * }
+ * </pre>
+ * 
+ * @see Query
+ * @see FieldQuery
  * 
  * @author Johannes Dahlström
  * 
  * @param <C>
- *            The type of {@code Component} the query represents.
+ *            The type of the {@code Component}s the query represents.
  * @param <This>
- *            The type of the class extending {@code AbstractQuery}.
+ *            The type of the class extending {@code AbstractQuery}. Used in
+ *            return values to enable method chaining.
  */
 public abstract class AbstractQuery<C extends Component, This extends AbstractQuery<C, This>>
         implements Serializable, Iterable<C> {
@@ -72,7 +95,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query that is the union of {@code this} and {@code that}.
+     * Returns the union of {@code this} and {@code that}.
      */
     public <That extends AbstractQuery<? extends C, That>> This with(That that) {
         Set<C> result = set(cs);
@@ -89,15 +112,16 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * {@link Predicate#apply(Component) p.apply()} returns true.
      * 
      * @param p
-     *            The predicate used for filtering.
+     *            The predicate used for filtering. Cannot be null.
      */
     public This filter(Predicate<? super C> p) {
         return filter(new ByPredicate<C>(p));
     }
 
     /**
-     * Returns a query with those components that have the given id. There
-     * should be only one, but this is not enforced.
+     * Returns the subset of components in this set that have the given id.
+     * There should be only one, but this is not enforced. The {@link #one()}
+     * method may be used to ensure there is exactly one such component.
      * 
      * @param id
      *            The id. Cannot be null.
@@ -112,7 +136,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query that have the given
+     * Returns the subset of components in this set that have the given
      * stylename.
      */
     public This hasStyleName(final String styleName) {
@@ -126,8 +150,8 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query that have the given
-     * primary stylename.
+     * Returns the subset of components in this set that have the given primary
+     * stylename.
      */
     public This hasPrimaryStyleName(final String styleName) {
         return filter(new ByPredicate<C>(new Predicate<C>() {
@@ -139,7 +163,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query for which
+     * Returns the subset of components in this set for which
      * {@code isVisible() == visible}.
      */
     public This isVisible(final boolean visible) {
@@ -152,7 +176,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query for which
+     * Returns the subset of components in this set for which
      * {@code isEnabled() == enabled}.
      */
     public This isEnabled(final boolean enabled) {
@@ -165,7 +189,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query for which
+     * Returns the subset of components in this set for which
      * {@code isReadOnly() == readOnly}.
      */
     public This isReadOnly(final boolean readOnly) {
@@ -178,12 +202,12 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components in this query that either have or
-     * do not have at least one component child, depending on whether
-     * {@code leaf} is true or false, respectively.
+     * If the parameter {@code leaf} is true, returns the subset of components
+     * in this set that are leaf nodes, that is, those that do not have any
+     * children. Otherwise, returns those that do have children.
      * <p>
-     * Note that layouts and other component containers are leaf nodes iff they
-     * are empty.
+     * Note that layouts and other component containers that do not have any
+     * children are considered leaf nodes.
      */
     public This isLeaf(final boolean leaf) {
         return filter(new Predicate<C>() {
@@ -196,14 +220,14 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components that are
+     * Returns the subset of components in this set for which
+     * {@code isAttached() == attached}.
      */
     public This isAttached(final boolean attached) {
         return filter(new Predicate<C>() {
             @Override
             public boolean apply(C c) {
-                // TODO use c.isAttached() once available
-                return (c.getUI() != null && c.getUI().getSession() != null) == attached;
+                return c.isAttached() == attached;
             }
         });
     }
@@ -221,7 +245,14 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query with those components whose type is the given class.
+     * Returns the subset of components in this set that are instances of the
+     * given subtype of {@link C}.
+     * <p>
+     * Example:
+     * <p>
+     * {@code myQuery.is(Button.class)} returns a {@code Query<Button>}.
+     * 
+     * @return a Query with the given component type.
      */
     public <D extends C> Query<D> is(Class<D> klass) {
         Set<D> result = set();
@@ -233,6 +264,10 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
         return new Query<D>(result);
     }
 
+    /**
+     * Returns the subset of components in this set that are instances of the
+     * given interface in addition to {@code C}.
+     */
     public This is(Class<?> klass) {
         Set<C> result = set();
         for (C c : this) {
@@ -244,8 +279,8 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a FieldQuery with all the components in this query that are
-     * fields.
+     * Returns a FieldQuery instance representing the subset of components in
+     * this set that are fields.
      */
     public FieldQuery<Field<?>> isField() {
         Set<Field<?>> result = set();
@@ -258,8 +293,8 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a FieldQuery with all the components in this query that are
-     * fields of the given type.
+     * Returns a FieldQuery representing the subset of components in this set
+     * that are fields of the given type.
      */
     public <F extends Field<?>> FieldQuery<F> isField(Class<F> fieldType) {
         Set<F> result = set();
@@ -279,7 +314,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      **************************/
 
     /**
-     * Adds the given stylename to all the components in this query.
+     * Adds the given stylename to all the components in this set.
      */
     public This addStyleName(String sn) {
         for (C c : this) {
@@ -289,7 +324,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Removes the given stylename from all the components in this query.
+     * Removes the given stylename from all the components in this set.
      */
     public This removeStyleName(String sn) {
         for (C c : this) {
@@ -530,8 +565,8 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Removes from {@code parent} all the components in this query that are
-     * children of {@code parent}.
+     * Removes from {@code parent} all the components in this query that are its
+     * children.
      */
     public This removeFrom(HasComponents parent) {
         for (C c : this) {
@@ -551,7 +586,8 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      *****************/
 
     /**
-     * Returns an iterator yielding all the components in this query.
+     * Returns an iterator yielding all the components in this set in original
+     * insertion order.
      */
     @Override
     public Iterator<C> iterator() {
@@ -559,14 +595,15 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a set containing all the components in this query.
+     * Returns a {@link Set} containing all the components in this set.
      */
-    public Set<? extends C> get() {
+    public Set<C> get() {
         return set(cs);
     }
 
     /**
-     * Returns the component at the given index.
+     * Returns the component at the given index in this set. The indices are
+     * based on the original insertion order.
      * 
      * @throws IndexOutOfBoundsException
      *             if the index is out of bounds.
@@ -584,11 +621,13 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns a query containing those components whose index is in the range
-     * [from, to).
+     * Returns a query containing those components whose index is in the range [
+     * {@code from}, {@code to}). The indices are based on the original
+     * insertion order.
      * 
      * @throws IndexOutOfBoundsException
-     *             if the indices are out of rance of if to < from.
+     *             if {@code from} or {@code to} is out of bounds or if
+     *             {@code to} < {@codefrom}.
      */
     public This slice(int from, int to) {
         if (from < 0 || from >= size() || to < from || from > size()) {
@@ -610,7 +649,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * If this query contains exactly one component, returns the component.
+     * If this set contains exactly one component, returns the component.
      * Otherwise, throws.
      */
     public C one() {
@@ -622,7 +661,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns whether this query contains at least one component.
+     * Returns whether this set contains at least one component.
      * 
      * @return
      */
@@ -631,7 +670,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
-     * Returns the number of components in this query.
+     * Returns the number of components in this set.
      */
     public int size() {
         return cs.size();
@@ -641,10 +680,16 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Helpers
      */
 
+    /**
+     * Returns whether this set is equal to {@code that}. An
+     * {@code AbstractQuery} instance is equal to another object if and only if
+     * the are of the same type and contain the same components, disregarding
+     * order.
+     */
     @Override
-    public boolean equals(Object o) {
-        return getClass() == o.getClass()
-                && cs.equals(((AbstractQuery<?, ?>) o).cs);
+    public boolean equals(Object that) {
+        return getClass() == that.getClass()
+                && cs.equals(((AbstractQuery<?, ?>) that).cs);
     }
 
     @Override
@@ -652,24 +697,43 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
         return getClass().getSimpleName() + cs;
     }
 
+    /**
+     * Returns a new {@code This} instance containing the same components as
+     * {@code cs}.
+     */
     abstract protected <D extends C> This createQuery(Set<D> cs);
 
     protected This createQuery() {
         return createQuery(get());
     }
 
+    /**
+     * Returns the set of components returned by the given {@link Map} when
+     * applied to this set.
+     */
     protected <D extends Component> AbstractQuery<D, ?> map(Map<C, D> m) {
         return new Query<D>(m.apply(cs));
     }
 
+    /**
+     * Returns the subset of components returned by the given {@link Filter}
+     * when applied to this set.
+     */
     protected This filter(Filter<C> f) {
         return createQuery(f.apply(cs));
     }
 
+    /**
+     * Returns a new empty set of the appropriate type.
+     */
     protected static <D extends Component> Set<D> set() {
         return set(Collections.<D> emptySet());
     }
 
+    /**
+     * Returns a new set of the appropriate type, containing the same elements
+     * as {@code cs}.
+     */
     protected static <D extends Component> Set<D> set(Collection<? extends D> cs) {
         return new LinkedHashSet<D>(cs);
     }
