@@ -520,33 +520,45 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      */
     public This addTo(ComponentContainer cc) {
         cc.addComponents(cs.toArray(new Component[size()]));
-        return (This) this;
-    }
-
-    /**
-     * Adds all the components in this query to the given index in {@code aol},
-     * removing them from their original parents if any.
-     */
-    public This addTo(AbstractOrderedLayout aol, int index) {
-        for (C c : this) {
-            aol.addComponent(c, index++);
-        }
         return createQuery();
     }
 
     /**
-     * Adds all the components in this query to the given index in {@code cssl},
-     * removing them from their original parents if any.
+     * Adds all the components in this query to the given index in
+     * {@code layout}, removing them from their original parents if any.
      */
-    public This addTo(CssLayout cssl, int index) {
-        Component previous = null;
-        for (C c : this) {
-            int i = previous == null ? index
-                    : cssl.getComponentIndex(previous) + 1;
-            cssl.addComponent(c, i);
-            previous = c;
-        }
-        return createQuery();
+    public This addTo(AbstractOrderedLayout layout, int index) {
+        return addTo((ComponentContainer) layout, index);
+    }
+
+    /**
+     * Adds all the components in this query to the given index in
+     * {@code layout}, removing them from their original parents if any.
+     */
+    public This addTo(CssLayout layout, int index) {
+        return addTo((ComponentContainer) layout, index);
+    }
+
+    /**
+     * Adds the components in this set after c if the parent of c supports it.
+     * 
+     * @throws IllegalArgumentException
+     *             if c has no parent or the parent does not support adding
+     *             components at a specified index.
+     */
+    public This addAfter(Component c) {
+        return addTo(c.getParent(), getComponentIndex(c) + 1);
+    }
+
+    /**
+     * Adds the components in this set before c if the parent of c supports it.
+     * 
+     * @throws IllegalArgumentException
+     *             if c has no parent or the parent does not support adding
+     *             components at a specified index.
+     */
+    public This addBefore(Component c) {
+        return addTo(c.getParent(), getComponentIndex(c));
     }
 
     /**
@@ -649,6 +661,26 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
     }
 
     /**
+     * Returns the first component in this set.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if the set is empty.
+     */
+    public C first() {
+        return index(0);
+    }
+
+    /**
+     * Returns the last component in this set.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if the set is empty.
+     */
+    public C last() {
+        return index(size() - 1);
+    }
+
+    /**
      * If this set contains exactly one component, returns the component.
      * Otherwise, throws.
      */
@@ -736,5 +768,59 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      */
     protected static <D extends Component> Set<D> set(Collection<? extends D> cs) {
         return new LinkedHashSet<D>(cs);
+    }
+
+    /**
+     * Calls {@code parent.addComponent(c, index)}.
+     * 
+     * @throws IllegalArgumentException
+     *             if {@code parent} is not a CssLayout or an
+     *             AbstractOrderedLayout.
+     */
+    protected static void addComponent(HasComponents parent, Component c,
+            int index) {
+        if (parent instanceof CssLayout) {
+            ((CssLayout) parent).addComponent(c, index);
+        } else if (parent instanceof AbstractOrderedLayout) {
+            ((AbstractOrderedLayout) parent).addComponent(c, index);
+        } else {
+            throw new IllegalArgumentException(
+                    "Parent is not a CssLayout or an AbstractOrderedLayout");
+        }
+    }
+
+    /**
+     * Returns {@code c.getParent().getComponentIndex(c)}.
+     * 
+     * @throws IllegalArgumentException
+     *             if {@code c.getParent()} is not a CssLayout or an
+     *             AbstractOrderedLayout.
+     */
+    protected static int getComponentIndex(Component c) {
+        Component parent = c.getParent();
+        if (parent instanceof CssLayout) {
+            return ((CssLayout) parent).getComponentIndex(c);
+        } else if (parent instanceof AbstractOrderedLayout) {
+            return ((AbstractOrderedLayout) parent).getComponentIndex(c);
+        } else {
+            throw new IllegalArgumentException(
+                    "Parent is not a CssLayout or an AbstractOrderedLayout");
+        }
+    }
+
+    /**
+     * Adds the components in this set to {@code parent} at {@code index}.
+     * 
+     * @throws IllegalArgumentException
+     *             if {@code c.getParent()} is not a CssLayout or an
+     *             AbstractOrderedLayout.
+     */
+    protected This addTo(HasComponents parent, int index) {
+        for (C c : this) {
+            boolean wasAlreadyChild = c.getParent() == parent;
+            addComponent(parent, c, index);
+            index = (wasAlreadyChild ? getComponentIndex(c) : index) + 1;
+        }
+        return createQuery();
     }
 }
