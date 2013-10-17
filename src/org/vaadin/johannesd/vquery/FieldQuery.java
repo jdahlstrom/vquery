@@ -91,6 +91,13 @@ public class FieldQuery<F extends Field<?>> extends
         return createQuery();
     }
 
+    public FieldQuery<F> removeValueChangeListener(ValueChangeListener listener) {
+        for (Field<?> f : get()) {
+            f.removeValueChangeListener(listener);
+        }
+        return createQuery();
+    }
+
     public FieldQuery<F> setRequired(boolean required) {
         for (Field<?> f : get()) {
             f.setRequired(required);
