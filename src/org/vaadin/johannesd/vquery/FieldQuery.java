@@ -60,6 +60,24 @@ public class FieldQuery<F extends Field<?>> extends
         });
     }
 
+    public FieldQuery<F> isBuffered(final boolean buffered) {
+        return filter(new Predicate<F>() {
+            @Override
+            public boolean apply(F f) {
+                return f.isBuffered() == buffered;
+            }
+        });
+    }
+
+    public FieldQuery<F> isModified(final boolean modified) {
+        return filter(new Predicate<F>() {
+            @Override
+            public boolean apply(F f) {
+                return f.isModified() == modified;
+            }
+        });
+    }
+
     public FieldQuery<F> hasValue(final Object value) {
         return filter(new Predicate<F>() {
             @Override
@@ -105,6 +123,13 @@ public class FieldQuery<F extends Field<?>> extends
         return createQuery();
     }
 
+    public FieldQuery<F> setBuffered(boolean buffered) {
+        for (Field<?> f : this) {
+            f.setBuffered(buffered);
+        }
+        return createQuery();
+    }
+
     public FieldQuery<F> setRequiredError(String error) {
         for (Field<?> f : this) {
             f.setRequiredError(error);
@@ -122,6 +147,22 @@ public class FieldQuery<F extends Field<?>> extends
     public FieldQuery<F> removeValidator(Validator v) {
         for (Field<?> f : this) {
             f.removeValidator(v);
+        }
+        return createQuery();
+    }
+
+    public FieldQuery<F> commit() {
+        for (Field<?> f : this) {
+            // TODO transactionality
+            f.commit();
+        }
+        return createQuery();
+    }
+
+    public FieldQuery<F> discard() {
+        for (Field<?> f : this) {
+            // TODO transactionality
+            f.discard();
         }
         return createQuery();
     }
