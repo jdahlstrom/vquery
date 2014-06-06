@@ -85,7 +85,7 @@ public class VQueryTest extends AbstractQueryTest {
 
     @Test
     public void testSelectFields() {
-        FieldQuery<?> selected = VQuery.select(fields);
+        FieldQuery<?> selected = VQuery.selectFields(fields);
         Assert.assertEquals(new FieldQuery<Field<?>>(Arrays.asList(fields)),
                 selected);
 

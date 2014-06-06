@@ -30,6 +30,7 @@ public class VQuery {
         return all();
     }
 
+    @SafeVarargs
     public static <C extends Component> Query<C> $(C... cs) {
         return VQuery.select(Arrays.asList(cs));
     }
@@ -38,12 +39,12 @@ public class VQuery {
         return VQuery.select(cs);
     }
 
-    public static FieldQuery<Field<?>> $(Field<?>... fields) {
-        return VQuery.select(Arrays.asList(fields));
+    public static FieldQuery<Field<?>> $F(Field<?>... fields) {
+        return VQuery.selectFields(Arrays.asList(fields));
     }
 
-    public static FieldQuery<Field<?>> $(Collection<Field<?>> fields) {
-        return VQuery.select(fields);
+    public static FieldQuery<Field<?>> $F(Collection<Field<?>> fields) {
+        return VQuery.selectFields(fields);
     }
 
     public static Query<Component> all() {
@@ -54,6 +55,7 @@ public class VQuery {
         return ui.descendants().with(ui);
     }
 
+    @SafeVarargs
     public static <C extends Component> Query<C> select(C... cs) {
         return VQuery.select(Arrays.asList(cs));
     }
@@ -62,11 +64,11 @@ public class VQuery {
         return new Query<C>(new LinkedHashSet<C>(cs));
     }
 
-    public static FieldQuery<Field<?>> select(Field<?>... fields) {
-        return select(Arrays.asList(fields));
+    public static FieldQuery<Field<?>> selectFields(Field<?>... fields) {
+        return selectFields(Arrays.asList(fields));
     }
 
-    public static FieldQuery<Field<?>> select(Collection<Field<?>> fields) {
+    public static FieldQuery<Field<?>> selectFields(Collection<Field<?>> fields) {
         return new FieldQuery<Field<?>>(fields);
     }
 
