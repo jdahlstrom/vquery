@@ -30,7 +30,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -56,7 +56,7 @@ public class VQueryTest extends AbstractQueryTest {
         all = new Component[] { ui, uiContent, new Button(), new Label() };
 
         fields = new Field<?>[] { new TextField(), new CheckBox(),
-                new ProgressIndicator() };
+                new ProgressBar() };
 
         uiContent.addComponents(all[2], all[3]);
         ui.setContent(uiContent);
