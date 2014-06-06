@@ -115,7 +115,7 @@ public class FilteringTest {
 
         assertFalse(query.is(Label.class).exists());
 
-        Query<Component> props = query.is(Property.class);
+        Query<Component> props = query.isAlso(Property.class);
 
         assertEquals(3, props.size());
         assertSame(cs[1], props.index(0));

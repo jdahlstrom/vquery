@@ -268,7 +268,7 @@ public abstract class AbstractQuery<C extends Component, This extends AbstractQu
      * Returns the subset of components in this set that are instances of the
      * given interface in addition to {@code C}.
      */
-    public This is(Class<?> klass) {
+    public This isAlso(Class<?> klass) {
         Set<C> result = set();
         for (C c : this) {
             if (klass.isAssignableFrom(c.getClass())) {
